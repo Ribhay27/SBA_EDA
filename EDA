@@ -1,0 +1,12 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+df_2000s = pd.read_csv("2000-2009.csv", encoding='latin1')
+df_2010s = pd.read_csv("2010-2019.csv", encoding='latin1')
+df = pd.concat([df_2000s, df_2010s], ignore_index=True)
+df.head()
+print("This is the first set")
+print(df_2000s.shape)
+print("This is the second set")
+print(df_2010s.shape)
