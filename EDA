@@ -13,3 +13,4 @@ print(df_2010s.shape)
 df.info()
 df.describe(include='all')
 df.shape
+df.isnull().sum()
