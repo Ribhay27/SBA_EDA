@@ -10,3 +10,6 @@ print("This is the first set")
 print(df_2000s.shape)
 print("This is the second set")
 print(df_2010s.shape)
+df.info()
+df.describe(include='all')
+df.shape
