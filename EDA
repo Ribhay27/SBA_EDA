@@ -14,3 +14,14 @@ df.info()
 df.describe(include='all')
 df.shape
 df.isnull().sum()
+useless_cols=['AsOfDate','Program','BankNCUANumber','FranchiseCode',
+             'FranchiseName', 'BusinessAge', 'InitialInterestRate', 'ChargeOffDate']
+df.drop(columns=[col for col in useless_cols if col in df.columns], inplace=True) #I added this so we can keep rerunning this cell without errors
+
+df = df.copy() # i Added this as a checkpoint 
+df['NaicsDescription']   = df['NaicsDescription'].fillna('Unknown')
+df['BankFDICNumber']     = df['BankFDICNumber'].fillna(0)
+df['FirstDisbursementDate'] = df['FirstDisbursementDate'].fillna('Unknown')
+df['BusinessType']       = df['BusinessType'].fillna(df['BusinessType'].mode()[0])
+status_map = {'PIF': 1, 'CHGOFF': 0}
+df['LoanStatus'] = df['LoanStatus'].map(status_map)
