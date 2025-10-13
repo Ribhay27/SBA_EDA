@@ -1,0 +1,77 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+df_2000s = pd.read_csv("foia-7afy2000-fy2009-asof-221231.csv", encoding='latin1', low_memory = False)
+df_2010s = pd.read_csv("foia-7afy2010-fy2019-asof-221231.csv", encoding='latin1', low_memory = False)
+df = pd.concat([df_2000s, df_2010s], ignore_index=True)
+df.head()
+print("This is the first set")
+print(df_2000s.shape)
+print("This is the second set")
+print(df_2010s.shape)
+print("Data Frame Info")
+df.info()
+
+# good break point for jupyter
+
+print("Data Frame Description")
+df.describe(include='all')
+print(" Full Data frame size")
+df.shape
+print("Data Frame's null values")
+df.isnull().sum()
+
+# Another good point to break
+
+useless_cols=['AsOfDate','Program','BankNCUANumber','FranchiseCode',
+             'FranchiseName', 'BusinessAge', 'InitialInterestRate', 'ChargeOffDate']
+df.drop(columns=[col for col in useless_cols if col in df.columns], inplace=True) #I added this so we can keep rerunning this cell without errors
+
+df = df.copy() # i Added this as a checkpoint 
+
+# remove the NAICS Description and only keep the code, since it will be turned to binary weather the code is present or not, we wont have to do sentiment analysis on it 
+df['NaicsDescription']   = df['NaicsDescription'].fillna('Unknown')
+df['BankFDICNumber']     = df['BankFDICNumber'].fillna(0)
+df['FirstDisbursementDate'] = df['FirstDisbursementDate'].fillna('Unknown')
+df['BusinessType']       = df['BusinessType'].fillna(df['BusinessType'].mode()[0])
+
+# checks that all the columns we didn't want got removed
+df.info()
+
+# breaking point for jupyter
+
+#checks what values this column has
+df["LoanStatus"].unique()
+
+#removed the loans that were either, canceled, exempt or Commit, they dont fit our criteria leaving us iwth 947,339 lines of code
+df = df[df["LoanStatus"].isin(["PIF", "CHGOFF"])]
+#checks how many lines are left
+df.shape
+#checks that the non-null values stays at 947,339
+df.info()
+
+# breaking point again 
+
+#maps the paid and charged off loans into binary in the loan status column 
+status_map = {'PIF': 1, 'CHGOFF': 0}
+df['LoanStatus'] = df['LoanStatus'].map(status_map)
+# check to make sure the non- null values are the same and dont get messed up into all null 
+df.info()
+
+# break for jupyter cells 
+
+#checking how many have null values 
+df.isnull().sum()
+
+# break again for cells 
+
+#helpful commands
+
+# we need to make sure that the filler values match the values there and we dont put int with str and so on
+#df["LoanStatus"].nunique()
+df["LoanStatus"].unique()
+#df["LoanStatus"].value_counts()
+df["NaicsDescription"].dtype
+df["NaicsDescription"].apply(type).value_counts()
+
