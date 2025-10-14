@@ -66,6 +66,18 @@ df.isnull().sum()
 
 # break again for cells 
 
+df = df.dropna()
+
+df.info()
+
+#break after checking 
+
+# sanity check
+df.isnull().sum()
+#check how many instances we have left over 
+df.shape
+
+
 #helpful commands
 
 # we need to make sure that the filler values match the values there and we dont put int with str and so on
@@ -74,4 +86,6 @@ df["LoanStatus"].unique()
 #df["LoanStatus"].value_counts()
 df["NaicsDescription"].dtype
 df["NaicsDescription"].apply(type).value_counts()
+
+
 
