@@ -25,3 +25,25 @@ df['FirstDisbursementDate'] = df['FirstDisbursementDate'].fillna('Unknown')
 df['BusinessType']       = df['BusinessType'].fillna(df['BusinessType'].mode()[0])
 status_map = {'PIF': 1, 'CHGOFF': 0}
 df['LoanStatus'] = df['LoanStatus'].map(status_map)
+
+
+# Histograms for useful numeric variables
+histcols =  ['GrossApproval', 'SBAGuaranteedApproval', 'ApprovalFiscalYear', 'TermInMonths', 'LoanStatus', 'GrossChargeOffAmount', 'RevolverStatus', 'JobsSupported']
+plt.figure(figsize=(14, 10))
+for i, col in enumerate(histcols, 1):
+    plt.subplot(3, 3, i)
+    sns.histplot(df[col], bins=30, kde=True, color='skyblue')
+    plt.title(col)
+    plt.xlabel('')
+    plt.ylabel('Count')
+
+plt.tight_layout()
+plt.ticklabel_format(style='plain', axis='both')
+plt.show()
+
+
+# Heatmap Correlation Matrix
+numeric_df = df.select_dtypes(include='number')
+numeric_df = numeric_df.drop(columns=['BankFDICNumber', 'BorrZip', 'ApprovalFiscalYear', 'NaicsCode', 'CongressionalDistrict'])
+fig, ax1 = plt.subplots(figsize=(11, 11))
+sns.heatmap(numeric_df.corr(), annot=True, ax=ax1)
