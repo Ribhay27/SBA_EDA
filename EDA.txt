@@ -2,18 +2,94 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-df_2000s = pd.read_csv("2000-2009.csv", encoding='latin1')
-df_2010s = pd.read_csv("2010-2019.csv", encoding='latin1')
+
+df_1990s = pd.read_csv("foia-7afy1991-fy1999-asof-221231.csv", encoding='latin1', low_memory = False)
+df_2000s = pd.read_csv("2000-2009.csv", encoding='latin1', low_memory = False)
+df_2010s = pd.read_csv("2010-2019.csv", encoding='latin1', low_memory = False)
 df = pd.concat([df_2000s, df_2010s], ignore_index=True)
 df.head()
-print("This is the first set")
+
+df_1990s.info()
+
+# break
+print("This is the first set- 1990s")
+print(df_1990s.shape)
+
+print("Gross Approval Max for the 1990s")
+GA90 = df_1990s["GrossApproval"].max()
+print(GA90)
+
+print("Min Gross Approval Max for the 1990s")
+MINGA90 = df_1990s["GrossApproval"].min()
+print(MINGA90)
+
+print("Guaranteed Approval by the SBA for the 1990s")
+SBAGA90 = df_1990s["SBAGuaranteedApproval"].max()
+print(SBAGA90)
+
+print("Min Guaranteed Approval by the SBA for the 1990s")
+Min90 = df_1990s["SBAGuaranteedApproval"].min()
+print(Min90)
+
+# break
+print("This is the second set- 2000s")
 print(df_2000s.shape)
-print("This is the second set")
+
+print("Gross Approval Max for the 2000s")
+GA00 = df_2000s["GrossApproval"].max()
+print(GA00)
+
+print("Min Gross Approval Max for the 2000s")
+MINGA00 = df_2000s["GrossApproval"].min()
+print(MINGA00)
+
+
+print("Guaranteed Approval by the SBA for the 2000s")
+SBAGA00 = df_2000s["SBAGuaranteedApproval"].max()
+print(SBAGA00)
+
+print("Min Guaranteed Approval by the SBA for the 2000s")
+Min00 = df_2000s["SBAGuaranteedApproval"].min()
+print(Min00)
+
+
+print("This is the third set- 2010s")
 print(df_2010s.shape)
+
+print("Gross Approval Max for 2010s")
+GA10 = df_2010s["GrossApproval"].max()
+print(GA10)
+
+print("Min Gross Approval Max for 2010s")
+MINGA10 = df_2010s["GrossApproval"].min()
+print(MINGA10)
+
+print("Guaranteed Approval by the SBA for 2010s")
+SBAGA10 = df_2010s["SBAGuaranteedApproval"].max()
+print(SBAGA10)
+
+print("Min Guaranteed approval by the SBA for 2010s" )
+Min10 = df_2010s["SBAGuaranteedApproval"].min()
+print(Min10)
+
+
+for i, df in enumerate([df_1990s,df_2000s,df_2010s],start = 1):
+    print(f"\n Missing values in dataset {i}")
+    print(df.isnull().sum())
+    print(f"\nDuplicates: {df.duplicated().sum()}")
+
+# DataFrame Info
+print("Main Data Frame Info")
 df.info()
-df.describe(include='all')
-df.shape
+
+print("Data Frame Description")
+print(df.describe(include='all'))
+print(" Full Data frame size")
+print(df.shape)
+
+print("Data Frame's null values")
 df.isnull().sum()
+
 useless_cols=['AsOfDate','Program','BankNCUANumber','FranchiseCode',
              'FranchiseName', 'BusinessAge', 'InitialInterestRate', 'ChargeOffDate']
 df.drop(columns=[col for col in useless_cols if col in df.columns], inplace=True) #I added this so we can keep rerunning this cell without errors
@@ -23,9 +99,58 @@ df['NaicsDescription']   = df['NaicsDescription'].fillna('Unknown')
 df['BankFDICNumber']     = df['BankFDICNumber'].fillna(0)
 df['FirstDisbursementDate'] = df['FirstDisbursementDate'].fillna('Unknown')
 df['BusinessType']       = df['BusinessType'].fillna(df['BusinessType'].mode()[0])
+
+# see which we need to look over
+print(df["LoanStatus"].unique())
+#removed the loans that were either, canceled, exempt or Commit, they dont fit our criteria leaving us iwth 947,339 lines of code
+df = df[df["LoanStatus"].isin(["PIF", "CHGOFF"])]
+#checks how many lines are left
+print(df.shape)
+#checks that the non-null values stays at 947,339
+df.info()
+
+#checking how many have null values 
+df.isnull().sum()
+
+df = df.dropna()
+
+df.info()
+
+df.isnull().sum()
+
 status_map = {'PIF': 1, 'CHGOFF': 0}
 df['LoanStatus'] = df['LoanStatus'].map(status_map)
 
+matrix = np.array([[GA90,GA00,GA10],
+                   [MINGA90,MINGA00,MINGA10],
+                   [SBAGA90,SBAGA00,SBAGA10],
+                   [Min90,Min00,Min10]])
+
+kidf = pd.DataFrame(matrix, 
+                   index = ["Gross Approval Max","Min Gross Approval","Max SBA Guaranteed Approval","Min SBA Guaranteed Approval"],
+                   columns = ['1990s','2000s','2010s'])
+
+print(kidf)
+
+kidf_long = kidf.reset_index().melt(
+    id_vars='index', 
+    var_name='Period', 
+    value_name='Value'
+)
+print(kidf_long)
+
+kidf_long.rename(columns={'index': 'Variable'}, inplace=True)
+
+print(kidf_long)
+
+sns.barplot(x='Variable', y='Value', hue='Period', data=kidf_long)
+
+plt.title("Gross and SBA Guaranteed Approvals by Time Period")
+plt.xlabel("Variable")
+plt.ylabel("Value")
+plt.xticks(rotation=20)
+plt.legend(title="Period")
+plt.show()
 
 # Histograms for useful numeric variables
 histcols =  ['GrossApproval', 'SBAGuaranteedApproval', 'ApprovalFiscalYear', 'TermInMonths', 'LoanStatus', 'GrossChargeOffAmount', 'RevolverStatus', 'JobsSupported']
