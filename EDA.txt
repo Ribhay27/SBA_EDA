@@ -172,3 +172,23 @@ numeric_df = df.select_dtypes(include='number')
 numeric_df = numeric_df.drop(columns=['BankFDICNumber', 'BorrZip', 'ApprovalFiscalYear', 'NaicsCode', 'CongressionalDistrict'])
 fig, ax1 = plt.subplots(figsize=(11, 11))
 sns.heatmap(numeric_df.corr(), annot=True, ax=ax1)
+
+
+
+
+
+#Univrate graphs 
+numeric_cols = ['GrossApproval', 'SBAGuaranteedApproval', 'TermInMonths',
+                'GrossChargeOffAmount', 'JobsSupported']
+
+# Histograms for numeric variables
+plt.figure(figsize=(14, 10))
+for i, col in enumerate(numeric_cols, 1):
+    plt.subplot(3, 3, i)
+    sns.histplot(df[col], bins=40, kde=True, color='steelblue')
+    plt.title(f"Distribution of {col}")
+    plt.xlabel(col)
+    plt.ylabel("Frequency")
+plt.tight_layout()
+plt.savefig("univariate_distributions.png", dpi=300, bbox_inches='tight')
+plt.show()
