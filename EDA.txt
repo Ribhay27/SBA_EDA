@@ -73,11 +73,6 @@ Min10 = df_2010s["SBAGuaranteedApproval"].min()
 print(Min10)
 
 
-for i, df in enumerate([df_1990s,df_2000s,df_2010s],start = 1):
-    print(f"\n Missing values in dataset {i}")
-    print(df.isnull().sum())
-    print(f"\nDuplicates: {df.duplicated().sum()}")
-
 # DataFrame Info
 print("Main Data Frame Info")
 df.info()
